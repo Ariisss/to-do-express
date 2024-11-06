@@ -1,21 +1,21 @@
 import { Request, Response, NextFunction } from 'express';
 import { AppError } from '../types/types';
 
-// Main error handler middleware - catches all errors thrown in the application
+//catches errors
 export function errorHandler(
   err: AppError,
   req: Request,
   res: Response,
   next: NextFunction
 ) {
-  // Use the error's status code if available, fallback to 500 (Internal Server Error)
+  // returns error status code or 500 if no error code
   const statusCode = err.statusCode || 500;
   const message = err.message || 'Internal Server Error';
 
-  // Log the full error stack for debugging
+  // logs the error stack
   console.error(`[Error] ${err.stack}`);
 
-  // Send a structured error response to the client
+  // returns the error response to client
   res.status(statusCode).json({
     status: 'error',
     code: err.code || 'INTERNAL_ERROR',
@@ -23,7 +23,7 @@ export function errorHandler(
   });
 }
 
-// Handle 404 Not Found errors for undefined routes
+// returns 404 error if route is not found
 export function notFoundHandler(
   req: Request,
   res: Response,

@@ -5,14 +5,14 @@ export function requestLogger(
   res: Response,
   next: NextFunction
 ) {
-  // Record the start time of the request
+  // records start time
   const start = Date.now();
 
-  // Listen for the 'finish' event to calculate request duration
   res.on('finish', () => {
+    // calculates duration
     const duration = Date.now() - start;
     
-    // Log request details: timestamp, method, URL, status code, and duration
+    // logs request details
     console.log(
       `[${new Date().toISOString()}] ${req.method} ${req.url} ${res.statusCode} ${duration}ms`
     );

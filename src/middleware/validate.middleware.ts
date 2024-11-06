@@ -1,13 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import Joi from 'joi';
 
-// Higher-order function that returns a middleware function
+// validates request body to match the type i n schema
 export function validateRequest(schema: Joi.ObjectSchema) {
   return (req: Request, res: Response, next: NextFunction) => {
-    // Validate request body against the provided schema
     const { error } = schema.validate(req.body, {
-      abortEarly: false,  // Report all errors, not just the first one
-      stripUnknown: true  // Remove unknown fields from the validated data
+      abortEarly: false,
+      stripUnknown: true 
     });
 
     if (error) {
@@ -26,15 +25,15 @@ export function validateRequest(schema: Joi.ObjectSchema) {
   };
 }
 
-// Custom password validation
+// password pattern (chatgpt hehe)
 const passwordPattern = /^(?=.*[A-Z])(?=.*\d).{6,}$/;
 const passwordMessage = 'Password must be at least 6 characters long, contain at least one uppercase letter and one number';
 
-// Custom email validation
+// email pattern (chatgpt hehe)
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const emailMessage = 'Please enter a valid email address';
 
-// Predefined validation schemas for different routes
+// schemas for diff routes
 export const schemas = {
   auth: {
     register: Joi.object({

@@ -8,7 +8,7 @@ interface AuthenticatedUser {
     created_at: string;
 }
 
-// Update the Request type augmentation
+// updates the request type to include the authenticated user
 declare global {
     namespace Express {
         interface Request {
@@ -23,7 +23,7 @@ export async function authenticate(
   next: NextFunction
 ) {
   try {
-    // Check for Bearer token in Authorization header
+    // bearer token check
     const authHeader = req.headers.authorization;
     
     if (!authHeader?.startsWith('Bearer ')) {
@@ -34,11 +34,11 @@ export async function authenticate(
       });
     }
 
-    // Extract and verify the JWT token
+    // extract token from header
     const token = authHeader.split(' ')[1];
     const decoded = verifyToken(token);
 
-    // Verify user exists in database
+    // verify user in db
     const { data: user, error } = await supabase
       .from('users')
       .select('id, email, created_at')
@@ -53,7 +53,7 @@ export async function authenticate(
       });
     }
 
-    // Attach user to request for use in route handlers
+    // attach user to request for use in route handlers
     req.authUser = user;
     next();
   } catch (error) {
