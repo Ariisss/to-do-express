@@ -20,16 +20,16 @@ export class User
 User.init(
   {
     id: {
-      type: DataTypes.INTEGER.UNSIGNED, // Unsigned integer
+      type: DataTypes.INTEGER.UNSIGNED,
       autoIncrement: true,
       primaryKey: true,
     },
     email: {
       type: DataTypes.STRING(128),
       allowNull: false,
-      unique: true, // Unique constraint
+      unique: true,
       validate: {
-        isEmail: true, // Validates email format
+        isEmail: true,
       },
     },
     password: {
@@ -38,8 +38,8 @@ User.init(
     },
   },
   {
-    tableName: 'users', // Specify table name
-    sequelize, // Pass the Sequelize instance
+    tableName: 'users',
+    sequelize,
     timestamps: true,
   }
 );

@@ -53,6 +53,6 @@ Todo.init(
   }
 );
 
-// Associations
+// relations
 User.hasMany(Todo, { foreignKey: 'userId' });
 Todo.belongsTo(User, { foreignKey: 'userId' });

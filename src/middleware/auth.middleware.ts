@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction, RequestHandler } from 'express';
 import { verifyToken } from '../utils/jwt.utils';
 
-// Middleware to authenticate JWT tokens
+// validate jwt tokens
 export const authenticate: RequestHandler = (
   req: Request,
   res: Response,
@@ -13,10 +13,10 @@ export const authenticate: RequestHandler = (
     return;
   }
 
-  const token = header.split(' ')[1]; // Bearer <token>
+  const token = header.split(' ')[1];
   try {
     const decoded = verifyToken(token);
-    req.user = decoded; // Attach user info to the request
+    req.user = decoded;
     next();
   } catch (error) {
     res.status(401).json({ message: 'Unauthorized' });

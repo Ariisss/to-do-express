@@ -4,19 +4,13 @@ import { authenticate } from '../middleware/auth.middleware';
 
 const router = Router();
 
-// Apply authentication middleware to all todo routes
+// applies auth on all routes
 router.use(authenticate);
 
-// Create a new todo
+// endpoints:
 router.post('/', create);
-
-// Get all todos
 router.get('/', list);
-
-// Update a todo
 router.put('/:id', update);
-
-// Delete a todo
 router.delete('/:id', remove);
 
 export default router;
