@@ -46,3 +46,29 @@ export async function getTodos(req: Request, res: Response) {
     }
 }
 
+export async function getTodoById(req: Request, res: Response) {
+
+    try {
+        const userId = req.authUser.id
+        const todoId = req.params.id
+
+        const todo = await todoService.getTodoById(userId, todoId)
+        
+        res.json({
+            status: 'success',
+            data: todo
+        })
+    } catch (error) {
+        if (error instanceof Error && error.message === 'Todo not found') {
+            return res.status(404).json({
+                status: 'error',
+                message: 'Todo not found'
+            })
+        }
+
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to fetch todo'
+        })
+    }
+}
