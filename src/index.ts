@@ -1,18 +1,37 @@
-import express, { Request, Response } from "express";
-import env from "./config/environment";
-import { initializeDatabase } from './config/database';
+import express from 'express';
+import bodyParser from 'body-parser';
+import authRoutes from './routes/auth.routes';
+import todoRoutes from './routes/todo.routes';
+import { errorHandler } from './middleware/error.middleware';
+import {requestLogger}  from './middleware/logger.middleware';
+import  sequelize  from './config/database';
 
 const app = express();
-const port = env.PORT;
 
-// Initialize database before starting server
-initializeDatabase().then(() => {
-  app.get("/", (req: Request, res: Response) => {
-    res.send("Hello World");
-  });
+app.use(bodyParser.json());
+app.use(requestLogger);
 
-  app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
-  });
-});
+// routes
+app.use('/auth', authRoutes);
+app.use('/todos', todoRoutes);
 
+// global error handling
+app.use(errorHandler);
+
+// wait for db connection and start server
+const startServer = async () => {
+  try {
+    await sequelize.authenticate();
+    console.log('Database connected');
+    await sequelize.sync();
+
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error('Unable to connect to the database:', error);
+  }
+};
+
+startServer();
