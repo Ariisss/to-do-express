@@ -1,83 +1,58 @@
-import { Model, DataTypes } from "sequelize";
-import sequelize from "../config/database";
-import User from "./user.model";
+import { DataTypes, Model, Optional } from 'sequelize';
+import sequelize from '../config/database';
+import { User } from './user.model';
 
 interface TodoAttributes {
-    id: string;
-    user_id: string;
-    title: string;
-    description?: string;
-    is_completed: boolean;
-    created_at: Date;
-    updated_at: Date;
-  }
-
-
-interface TodoCreationAttributes {
-    user_id: string;
-    title: string;
-    description?: string;
+  id: number;
+  title: string;
+  description?: string;
+  completed: boolean;
+  userId: number;
 }
 
-// define todo model for sequelize
-class Todo extends Model<TodoAttributes, TodoCreationAttributes> {
-    declare id: string;
-    declare user_id: string;
-    declare title: string;
-    declare description: string | null;
-    declare is_completed: boolean;
-    declare created_at: Date;
-    declare updated_at: Date;
-  }
+interface TodoCreationAttributes
+  extends Optional<TodoAttributes, 'id' | 'completed'> {}
 
-  // init sequelize todo model w/ options
+export class Todo
+  extends Model<TodoAttributes, TodoCreationAttributes>
+  implements TodoAttributes {
+  public id!: number;
+  public title!: string;
+  public description?: string;
+  public completed!: boolean;
+  public userId!: number;
+}
+
 Todo.init(
-    {
-      id: {
-        type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4,
-        primaryKey: true
-      },
-      user_id: {
-        type: DataTypes.UUID,
-        allowNull: false,
-        references: {
-          model: User,
-          key: 'id'
-        }
-      },
-      title: {
-        type: DataTypes.STRING,
-        allowNull: false
-      },
-      description: {
-        type: DataTypes.TEXT,
-        allowNull: true
-      },
-      is_completed: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false
-      },
-      created_at: {
-        type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW
-      },
-      updated_at: {
-        type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW
-      }
+  {
+    id: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      autoIncrement: true,
+      primaryKey: true,
     },
-    {
-      sequelize,
-      tableName: 'todos',
-      timestamps: true,
-      createdAt: 'created_at',
-      updatedAt: 'updated_at'
-    }
-  );
-  
-  // relationships
-  Todo.belongsTo(User, { foreignKey: 'user_id' });
-  User.hasMany(Todo, { foreignKey: 'user_id' });
-  
-  export default Todo;
+    title: {
+      type: DataTypes.STRING(128),
+      allowNull: false,
+    },
+    description: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    completed: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    userId: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      allowNull: false,
+    },
+  },
+  {
+    tableName: 'todos',
+    sequelize,
+  }
+);
+
+// Associations
+User.hasMany(Todo, { foreignKey: 'userId' });
+Todo.belongsTo(User, { foreignKey: 'userId' });
