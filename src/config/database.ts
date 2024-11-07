@@ -13,19 +13,19 @@ const sequelize = new Sequelize(env.DATABASE_URL, {
   }
 });
 
-// init database connection
-export async function initializeDatabase() {
-  try {
-    await sequelize.authenticate();
-    console.log('Database connection established.');
+// // init database connection
+// export async function initializeDatabase() {
+//   try {
+//     await sequelize.authenticate();
+//     console.log('Database connection established.');
     
-    // Sync all models
-    await sequelize.sync({ alter: true }); 
-    console.log('Database synchronized.');
-  } catch (error) {
-    console.error('Unable to connect to database:', error);
-    process.exit(1); // Exit if database connection fails
-  }
-}
+//     // Sync all models
+//     await sequelize.sync({ alter: true }); 
+//     console.log('Database synchronized.');
+//   } catch (error) {
+//     console.error('Unable to connect to database:', error);
+//     process.exit(1); // Exit if database connection fails
+//   }
+// }
 
 export default sequelize;
