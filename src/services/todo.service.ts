@@ -1,72 +1,29 @@
-import { TodoCreate, TodoUpdate } from '../types/types';
-import Todo from '../models/todo.model';
+import { Todo } from '../models/todo.model';
 
-// create todo function
-export async function createTodo(userId: string, data: TodoCreate) {
-  return Todo.create({
-    user_id: userId,
-    title: data.title,
-    description: data.description
-  });
-}
-
-// get todos (sorts by newest first)
-export async function getTodos(userId: string) {
-  return Todo.findAll({
-    where: { user_id: userId },
-    order: [['created_at', 'DESC']]
-  });
-}
-
-// gets specific todo
-export async function getTodoById(userId: string, todoId: string) {
-  const todo = await Todo.findOne({
-    where: { 
-      id: todoId,
-      user_id: userId
-    }
-  });
-
-  if (!todo) {
-    throw new Error('Todo not found');
-  }
-
+export const createTodo = async (userId: number, data: any) => {
+  const todo = await Todo.create({ ...data, userId });
   return todo;
-}
+};
 
-// updates a todo
-export async function updateTodo(
-  userId: string, 
-  todoId: string, 
-  data: TodoUpdate
-) {
-  const todo = await Todo.findOne({
-    where: { 
-      id: todoId,
-      user_id: userId
-    }
-  });
+export const getTodos = async (userId: number) => {
+  const todos = await Todo.findAll({ where: { userId } });
+  return todos;
+};
 
-  if (!todo) {
-    throw new Error('Todo not found');
-  }
+export const updateTodo = async (
+  userId: number,
+  todoId: number,
+  data: any
+) => {
+  const todo = await Todo.findOne({ where: { id: todoId, userId } });
+  if (!todo) throw new Error('Todo not found');
+  await todo.update(data);
+  return todo;
+};
 
-  return todo.update({
-    ...data,
-    is_completed: data.is_completed !== undefined ? data.is_completed : todo.is_completed
-  });
-}
-
-// deletes a todo
-export async function deleteTodo(userId: string, todoId: string) {
-  const deleted = await Todo.destroy({
-    where: { 
-      id: todoId,
-      user_id: userId
-    }
-  });
-
-  if (!deleted) {
-    throw new Error('Todo not found');
-  }
-}
+export const deleteTodo = async (userId: number, todoId: number) => {
+  const todo = await Todo.findOne({ where: { id: todoId, userId } });
+  if (!todo) throw new Error('Todo not found');
+  await todo.destroy();
+  return;
+};
