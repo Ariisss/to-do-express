@@ -6,12 +6,12 @@ interface TodoAttributes {
   id: number;
   title: string;
   description?: string;
-  completed: boolean;
-  userId: number;
+  is_completed: boolean;
+  user_id: number;
 }
 
 interface TodoCreationAttributes
-  extends Optional<TodoAttributes, 'id' | 'completed'> {}
+  extends Optional<TodoAttributes, 'id' | 'is_completed'> {}
 
 export class Todo
   extends Model<TodoAttributes, TodoCreationAttributes>
@@ -19,14 +19,14 @@ export class Todo
   public id!: number;
   public title!: string;
   public description?: string;
-  public completed!: boolean;
-  public userId!: number;
+  public is_completed!: boolean;
+  public user_id!: number;
 }
 
 Todo.init(
   {
     id: {
-      type: DataTypes.INTEGER.UNSIGNED,
+      type: DataTypes.INTEGER,
       autoIncrement: true,
       primaryKey: true,
     },
@@ -38,21 +38,23 @@ Todo.init(
       type: DataTypes.TEXT,
       allowNull: true,
     },
-    completed: {
+    is_completed: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
-    userId: {
-      type: DataTypes.INTEGER.UNSIGNED,
+    user_id: {
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
   },
   {
     tableName: 'todos',
     sequelize,
+    underscored: true,
+    timestamps: true,
   }
 );
 
 // relations
-User.hasMany(Todo, { foreignKey: 'userId' });
-Todo.belongsTo(User, { foreignKey: 'userId' });
+User.hasMany(Todo, { foreignKey: 'user_id' });
+Todo.belongsTo(User, { foreignKey: 'user_id' });
