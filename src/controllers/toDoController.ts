@@ -26,3 +26,23 @@ export async function createTodo(req: Request, res: Response) {
         });
     }
 }
+
+export async function getTodos(req: Request, res: Response) {
+
+    try {
+        const userId = req.authUser.id
+        const todos = await todoService.getTodos(userId)
+
+        res.status(200).json({
+            status: 'success',
+            data: todos
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to get todos'
+        });
+    }
+}
+
