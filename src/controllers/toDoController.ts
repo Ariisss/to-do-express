@@ -106,3 +106,26 @@ export async function updateTodo(req: Request, res: Response) {
         })
     }
 }
+
+export async function deleteTodo(req: Request, res: Response) {
+    try {
+      const userId = req.authUser.id;
+      const todoId = req.params.id;
+  
+      await todoService.deleteTodo(userId, todoId);
+  
+      res.status(204).send();
+    } catch (error) {
+      if (error instanceof Error && error.message === 'Todo not found') {
+        return res.status(404).json({
+          status: 'error',
+          message: 'Todo not found'
+        });
+      }
+  
+      res.status(500).json({
+        status: 'error',
+        message: 'Failed to delete todo'
+      });
+    }
+  }
