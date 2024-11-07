@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { verifyToken } from '../utils/jwt.utils';
+import UserModel from '../models/user.model';
 import supabase from '../config/database';
 
 interface AuthenticatedUser {
@@ -39,22 +40,26 @@ export async function authenticate(
     const decoded = verifyToken(token);
 
     // verify user in db
-    const { data: user, error } = await supabase
-      .from('users')
-      .select('id, email, created_at')
-      .eq('id', decoded.id)
-      .single();
+    const user = await UserModel.findOne({
+      where: { id: decoded.id },
+      attributes: ['id', 'email', 'created_at']
+    })
 
-    if (error || !user) {
+    if(!user) {
       return res.status(401).json({
         status: 'error',
         code: 'INVALID_TOKEN',
         message: 'Invalid authentication token'
       });
     }
-
+    
     // attach user to request for use in route handlers
-    req.authUser = user;
+    req.authUser = {
+      id: user.id,
+      email: user.email,
+      created_at: user.created_at.toISOString()
+    }
+
     next();
   } catch (error) {
     return res.status(401).json({
