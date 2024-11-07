@@ -1,131 +1,67 @@
-import { Request, Response } from 'express';
-import * as todoService from '../services/todo.service';
-import { TodoCreate, TodoUpdate } from '../types/types';
+import { Request, Response, NextFunction } from 'express';
+import {
+  createTodo,
+  getTodos,
+  updateTodo,
+  deleteTodo,
+} from '../services/todo.service';
 
-export async function createTodo(req: Request, res: Response) {
-    
-    try {
-
-        const userId = req.authUser.id
-        const todoData: TodoCreate = {
-            title: req.body.title,
-            description: req.body.description
-        }
-
-        const todo = await todoService.createTodo(userId, todoData);
-
-        res.status(201).json({
-            status: 'success',
-            data: todo
-        });
-
-    } catch (error) {
-        res.status(500).json({
-            status: 'error',
-            message: 'Failed to create todo'
-        });
-    }
-}
-
-export async function getTodos(req: Request, res: Response) {
-
-    try {
-        const userId = req.authUser.id
-        const todos = await todoService.getTodos(userId)
-
-        res.status(200).json({
-            status: 'success',
-            data: todos
-        });
-
-    } catch (error) {
-        res.status(500).json({
-            status: 'error',
-            message: 'Failed to get todos'
-        });
-    }
-}
-
-export async function getTodoById(req: Request, res: Response) {
-
-    try {
-        const userId = req.authUser.id
-        const todoId = req.params.id
-
-        const todo = await todoService.getTodoById(userId, todoId)
-        
-        res.json({
-            status: 'success',
-            data: todo
-        })
-    } catch (error) {
-        if (error instanceof Error && error.message === 'Todo not found') {
-            return res.status(404).json({
-                status: 'error',
-                message: 'Todo not found'
-            })
-        }
-
-        res.status(500).json({
-            status: 'error',
-            message: 'Failed to fetch todo'
-        })
-    }
-}
-
-export async function updateTodo(req: Request, res: Response) {
-
-    try {
-
-        const userId = req.authUser.id
-        const todoId = req.params.id
-        const updateData: TodoUpdate = {
-            title: req.body.title,
-            description: req.body.description,
-            is_completed: req.body.is_completed
-        };
-
-        const todo = await todoService.updateTodo(userId, todoId, updateData)
-
-        res.json({
-            status: 'success',
-            data: todo
-        })
-
-    } catch (error) {
-        if (error instanceof Error && error.message === 'Todo not found') {
-            return res.status(404).json({
-                status: 'error',
-                message: 'Todo not found'
-            })
-        }
-
-        res.status(500).json({
-            status: 'error',
-            message: 'Failed to update todo'
-        })
-    }
-}
-
-export async function deleteTodo(req: Request, res: Response) {
-    try {
-      const userId = req.authUser.id;
-      const todoId = req.params.id;
-  
-      await todoService.deleteTodo(userId, todoId);
-  
-      res.status(204).send();
-    } catch (error) {
-      if (error instanceof Error && error.message === 'Todo not found') {
-        return res.status(404).json({
-          status: 'error',
-          message: 'Todo not found'
-        });
-      }
-  
-      res.status(500).json({
-        status: 'error',
-        message: 'Failed to delete todo'
-      });
-    }
+// create todo
+export const create = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userId = req.user!.id
+    const todo = await createTodo(userId, req.body);
+    res.status(201).json({ todo });
+  } catch (error) {
+    next(error);
   }
+};
+
+// get todos
+export const list = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.user!.id
+    const todos = await getTodos(userId);
+    res.json({ todos });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// update todo
+export const update = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userId = req.user!.id
+    const todo = await updateTodo(
+      userId,
+      parseInt(req.params.id),
+      req.body
+    );
+    res.json({ todo });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// delete todo
+export const remove = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userId = req.user!.id
+    await deleteTodo(userId, parseInt(req.params.id));
+    res.status(204).send();
+  } catch (error) {
+    next(error);
+  }
+};
