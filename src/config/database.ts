@@ -13,6 +13,10 @@ const sequelize = new Sequelize(env.DATABASE_URL, {
   }
 });
 
+// sequelize.sync({ force: true }).then(() => {
+//   console.log('db synced');
+// });
+
 // // init database connection
 // export async function initializeDatabase() {
 //   try {
