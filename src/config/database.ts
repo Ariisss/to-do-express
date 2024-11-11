@@ -17,7 +17,6 @@ const sequelize = new Sequelize(env.DATABASE_URL, {
 //   console.log('db synced');
 // });
 
-// // init database connection
 // export async function initializeDatabase() {
 //   try {
 //     await sequelize.authenticate();
